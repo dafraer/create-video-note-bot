@@ -1,8 +1,10 @@
-FROM golang:latest
+FROM ubuntu:latest
 
 WORKDIR /app
 
 COPY . .
+
+RUN apt-get update && apt-get install -y golang ffmpeg
 
 RUN go mod download
 

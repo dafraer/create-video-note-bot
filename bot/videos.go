@@ -91,7 +91,7 @@ func (b *Bot) processVideo(ctx context.Context, update *models.Update) {
 	//Send VideoNote
 	_, err = b.b.SendVideoNote(ctx, &tgbotapi.SendVideoNoteParams{ChatID: update.Message.Chat.ID, VideoNote: &models.InputFileUpload{
 		Filename: "note.mp4",
-		Data:     bytes.NewReader(videoNote)}})
+		Data:     bytes.NewReader(videoNote)}, Length: min(video.Height, video.Width)})
 	if err != nil {
 		b.sendErrorMessage(ctx, update)
 		b.logger.Errorw("error sending message", "error", err)
@@ -153,6 +153,6 @@ func (b *Bot) cropVideoNote(ctx context.Context, data []byte, height, width int)
 		return nil, err
 	}
 
-	//Returned cropped version
+	//Return cropped version
 	return cropped, nil
 }
