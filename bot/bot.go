@@ -145,7 +145,7 @@ func loadMessages() *messages {
 		},
 		helpMsg: map[string]string{
 			"en": "Send me a video, and I’ll convert it into a video message (circle format) for you.\nThis is my only function.\nIf you have any questions contact the creator of the bot: @dafraer.",
-			"ru": "Отправь мне видео, и я сделаю из него видеосообщение (в кружочке) для тебя.\n Это моя единственная функция.\nесли у вас имеются дополнительные вопросы, пишите автору бота: @dafraer.",
+			"ru": "Отправь мне видео, и я сделаю из него видеосообщение (в кружочке) для тебя.\n Это моя единственная функция.\nЕсли у вас имеются дополнительные вопросы, пишите автору бота: @dafraer.",
 		},
 		videoTooLargeMsg: map[string]string{
 			"en": "The video you sent is too large. Please send a smaller file.",
