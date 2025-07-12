@@ -1,3 +1,3 @@
 #Pass version using command line argument
-command sudo docker build --no-cache  --platform linux/amd64 -t dafraer/create-video-note-bot:$1 .
-command  docker push dafraer/create-video-note-bot:$1
+command sudo docker build --no-cache  --platform linux/amd64 -t create-video-note-bot:$1 .
+command sudo docker run -d -e TOKEN=8032716817:AAE0JEthFKACO3ey_EWSrtSLmfBkOchZQdA create-video-note-bot:$1
