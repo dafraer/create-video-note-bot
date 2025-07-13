@@ -7,12 +7,12 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"os/exec"
 
 	"github.com/go-telegram/bot"
 	tgbotapi "github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"github.com/google/uuid"
+	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
 
 const (
@@ -91,7 +91,7 @@ func (b *Bot) processVideo(ctx context.Context, update *models.Update) {
 	//Send VideoNote
 	_, err = b.b.SendVideoNote(ctx, &tgbotapi.SendVideoNoteParams{ChatID: update.Message.Chat.ID, VideoNote: &models.InputFileUpload{
 		Filename: "note.mp4",
-		Data:     bytes.NewReader(videoNote)}, Length: min(video.Height, video.Width)})
+		Data:     bytes.NewReader(videoNote)}})
 	if err != nil {
 		b.sendErrorMessage(ctx, update)
 		b.logger.Errorw("error sending message", "error", err)
@@ -114,28 +114,34 @@ func (b *Bot) cropVideoNote(ctx context.Context, data []byte, height, width int)
 		return nil, err
 	}
 
-	//height and width of the resulting video
-	outSize := min(height, width)
+	err := ffmpeg.
+		Input(fileIn).
+		Output(fileOut,
+			ffmpeg.KwArgs{
+				"c:v":             "libx264",                                                                                              // H.264 encoder
+				"profile:v":       "high",                                                                                                 // High profile
+				"pix_fmt":         "yuv420p",                                                                                              // yuv420p
+				"color_primaries": "bt709",                                                                                                // BT.709 primaries
+				"color_trc":       "bt709",                                                                                                // BT.709 transfer
+				"colorspace":      "bt709",                                                                                                // BT.709 matrix
+				"vf":              `crop=min(in_w\,in_h):min(in_w\,in_h):(in_w-min(in_w\,in_h))/2:(in_h-min(in_w\,in_h))/2,scale=400:400`, // scale filter
+				"b:v":             "986k",                                                                                                 // 986 kb/s video bitrate
+				"r":               "30",                                                                                                   // 30 fps
+			},
+			ffmpeg.KwArgs{
+				"c:a":        "aac",     // AAC LC encoder
+				"profile:a":  "aac_low", // Low Complexity profile
+				"ac":         "1",       // mono
+				"ar":         "48000",   // 48 kHz
+				"sample_fmt": "fltp",    // float planar
+				"b:a":        "64k",     // 64 kb/s audio bitrate
+			},
+		).Run()
 
-	//x and y are starting coordinates from which the video will be cropped
-	x, y := 0, 0
-	if height > width {
-		y = (height - outSize) / 2
-	} else if width > height {
-		x = (width - outSize) / 2
-	}
-	cmd := exec.CommandContext(ctx, "ffmpeg", "-i", fileIn, "-vf", fmt.Sprintf("crop=%d:%d:%d:%d", outSize, outSize, x, y), fileOut)
-
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-
-	//Run the command
-	if err := cmd.Run(); err != nil {
-		b.logger.Debugw("stderr of ffmpeg", "error", stderr.String())
+	if err != nil {
 		return nil, err
 	}
 
-	//Read the resulting file
 	f, err := os.Open(fileOut)
 	if err != nil {
 		return nil, err
