@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	maxVideoSize     = 10_000_000
+	maxVideoSize     = 20_000_000
 	maxVideoDuration = 60
 	telegramFileLink = "https://api.telegram.org/file/bot%s/%s"
 )
@@ -82,12 +82,6 @@ func (b *Bot) processVideo(ctx context.Context, update *models.Update) {
 		return
 	}
 
-	//Delete waiting message
-	if _, err := b.b.DeleteMessage(ctx, &tgbotapi.DeleteMessageParams{ChatID: update.Message.Chat.ID, MessageID: waitMsg.ID}); err != nil {
-		b.logger.Errorw("Error sending message", "error", err)
-		return
-	}
-
 	//Send VideoNote
 	_, err = b.b.SendVideoNote(ctx, &tgbotapi.SendVideoNoteParams{ChatID: update.Message.Chat.ID, VideoNote: &models.InputFileUpload{
 		Filename: "note.mp4",
@@ -95,6 +89,12 @@ func (b *Bot) processVideo(ctx context.Context, update *models.Update) {
 	if err != nil {
 		b.sendErrorMessage(ctx, update)
 		b.logger.Errorw("error sending message", "error", err)
+	}
+
+	//Delete waiting message
+	if _, err := b.b.DeleteMessage(ctx, &tgbotapi.DeleteMessageParams{ChatID: update.Message.Chat.ID, MessageID: waitMsg.ID}); err != nil {
+		b.logger.Errorw("Error sending message", "error", err)
+		return
 	}
 }
 
