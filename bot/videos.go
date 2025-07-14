@@ -71,7 +71,7 @@ func (b *Bot) processVideo(ctx context.Context, update *models.Update) {
 	}
 
 	//Crop video to square
-	videoNote, err := b.cropVideoNote(ctx, data, video.Height, video.Width)
+	videoNote, err := b.cropVideoNote(data)
 	if err != nil {
 		b.logger.Errorw("Error cropping video", "error", err)
 		if _, err := b.b.DeleteMessage(ctx, &tgbotapi.DeleteMessageParams{ChatID: update.Message.Chat.ID, MessageID: waitMsg.ID}); err != nil {
@@ -106,7 +106,7 @@ func (b *Bot) processVideoTooLarge(ctx context.Context, update *models.Update) {
 }
 
 // cropVideoNote takes a video and returns a square‑cropped mp4. It uses ffmpeg
-func (b *Bot) cropVideoNote(ctx context.Context, data []byte, height, width int) ([]byte, error) {
+func (b *Bot) cropVideoNote(data []byte) ([]byte, error) {
 	//Create input and output files
 	fileIn := uuid.New().String() + ".mp4"
 	fileOut := uuid.New().String() + ".mp4"
