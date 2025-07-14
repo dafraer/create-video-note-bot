@@ -34,7 +34,7 @@ func main() {
 	}
 
 	//If webhook flag specified run bot using webhook
-	webhook := len(os.Args) == 3 && os.Args[2] == "-w"
+	webhook := len(os.Args) == 3 && os.Args[2] == "true"
 	if webhook {
 		if err := myBot.RunWebhook(ctx, ":8080"); err != nil {
 			panic(err)
