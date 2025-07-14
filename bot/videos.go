@@ -108,8 +108,8 @@ func (b *Bot) processVideoTooLarge(ctx context.Context, update *models.Update) {
 // cropVideoNote takes a video and returns a square‑cropped mp4. It uses ffmpeg
 func (b *Bot) cropVideoNote(data []byte) ([]byte, error) {
 	//Create input and output files
-	fileIn := uuid.New().String() + ".mp4"
-	fileOut := uuid.New().String() + ".mp4"
+	fileIn := "/tmp" + uuid.New().String() + ".mp4"
+	fileOut := "/tmp" + uuid.New().String() + ".mp4"
 	if err := os.WriteFile(fileIn, data, 0644); err != nil {
 		return nil, err
 	}
