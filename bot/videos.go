@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	maxVideoSize     = 20_000_000
+	maxVideoSize     = 30_000_000
 	maxVideoDuration = 60
 	telegramFileLink = "https://api.telegram.org/file/bot%s/%s"
 )
